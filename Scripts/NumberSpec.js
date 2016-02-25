@@ -19,10 +19,10 @@ function transform(
     )
 {
     var components = number.split('.');
-    components[0] = components[0].split(',').join(Number.prototype.symbols.group).replace(
+    components[0] = components[0].split(',').join(Number.symbols.group).replace(
         '-',
-        Number.prototype.symbols.minusSign);
-    return components.join(Number.prototype.symbols.decimal);
+        Number.symbols.minusSign);
+    return components.join(Number.symbols.decimal);
 }
 
 var testData =
@@ -172,7 +172,7 @@ describe(
     function()
     {
         assert.strictEquals("typeof parseNumberFormatPattern", "'function'");
-        assert.strictEquals("typeof Number.prototype.symbols", "'object'");
+        assert.strictEquals("typeof Number.symbols", "'object'");
 
         testData.forEach(
             function(

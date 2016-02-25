@@ -139,7 +139,7 @@
 
     <script type="text/javascript">
         var cldr = JSON.parse(document.getElementById('cldr').innerHTML);
-        Number.prototype.symbols = cldr.main['en-GB'].numbers['symbols-numberSystem-latn'];
+        Number.symbols = cldr.main['en-GB'].numbers['symbols-numberSystem-latn'];
     </script>
     <script type="text/javascript" src="Scripts/Number.js"></script>
 

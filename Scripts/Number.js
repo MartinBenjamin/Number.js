@@ -480,7 +480,7 @@ numberFormatSpecification.prototype.format = function(
             };
         });
 
-    if(this.primaryGroupingSize)
+    if(specification.primaryGroupingSize)
     {
         var regex = new RegExp(
             '(\\d)(?=(\\d{' + (specification.secondaryGroupingSize ? specification.secondaryGroupingSize : specification.primaryGroupingSize) + '})*\\d{' + specification.primaryGroupingSize + '}$)',
@@ -495,7 +495,7 @@ numberFormatSpecification.prototype.format = function(
                     positive: number.positive,
                     integer : number.integer.replace(
                         regex,
-                        '$1' + Number.prototype.symbols.group),
+                        '$1' + Number.symbols.group),
                     fraction: number.fraction
                 };
             });
@@ -524,13 +524,13 @@ numberFormatSpecification.prototype.format = function(
 
     var positive =
     {
-        prefix: this.prefix ? this.prefix : '',
-        suffix: this.suffix ? this.suffix : ''
+        prefix: specification.prefix ? specification.prefix : '',
+        suffix: specification.suffix ? specification.suffix : ''
     };
     var negative =
     {
-        prefix: this.negative ? (this.negative.prefix ? this.negative.prefix : '') : '-',
-        suffix: this.negative && this.negative.suffix ? this.negative.suffix : ''
+        prefix: specification.negative ? (specification.negative.prefix ? specification.negative.prefix : '') : '-',
+        suffix: specification.negative && specification.negative.suffix ? specification.negative.suffix : ''
     };
 
     transformations.push(
@@ -542,16 +542,16 @@ numberFormatSpecification.prototype.format = function(
             var formattedNumber =
                 affixes.prefix +
                 number.integer +
-                (number.fraction.length ? Number.prototype.symbols.decimal + number.fraction : '') +
+                (number.fraction.length ? Number.symbols.decimal + number.fraction : '') +
                 affixes.suffix;
 
             formattedNumber = formattedNumber.replace(
                 '+',
-                Number.prototype.symbols.plusSign)
+                Number.symbols.plusSign)
 
             formattedNumber = formattedNumber.replace(
                 '-',
-                Number.prototype.symbols.minusSign)
+                Number.symbols.minusSign)
 
             return formattedNumber;
         });
@@ -579,13 +579,13 @@ numberFormatSpecification.prototype.parse = function(
     )
 {
     var syntaxCharacters = /[\^$\\.*+?()[\]{}|]/g;
-    var decimalRegex = Number.prototype.symbols.decimal.replace(
+    var decimalRegex = Number.symbols.decimal.replace(
         syntaxCharacters,
         '\\$&');
-    var groupRegex = Number.prototype.symbols.group.replace(
+    var groupRegex = Number.symbols.group.replace(
         syntaxCharacters,
         '\\$&');
-    var minusRegex = Number.prototype.symbols.minusSign.replace(
+    var minusRegex = Number.symbols.minusSign.replace(
         syntaxCharacters,
         '\\$&');
 
@@ -646,8 +646,8 @@ numberFormatSpecification.prototype.parse = function(
     var numberRegex = integerRegex + fractionRegex;
 
     var localizedReplacements = {
-        '+': Number.prototype.symbols.plusSign,
-        '-': Number.prototype.symbols.minusSign
+        '+': Number.symbols.plusSign,
+        '-': Number.symbols.minusSign
     };
 
     function buildAffixRegex(
