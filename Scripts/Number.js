@@ -547,6 +547,55 @@ function numberFormatSubpattern(
         affixes = affixes ? affixes : this;
         return affixRegex(affixes.prefix) + this.numberRegex() + affixRegex(affixes.suffix);
     };
+
+    numberFormatSubpattern.prototype.toString = function()
+    {
+        var numberFormatSubpattern = '';
+
+        if(this.maximumFractionDigits)
+        {
+            numberFormatSubpattern += '.';
+            var fractionDigits = 0;
+            while(fractionDigits < this.minimumFractionDigits)
+            {
+                numberFormatSubpattern += '0';
+                ++fractionDigits;
+            }
+
+            while(fractionDigits < this.maximumFractionDigits)
+            {
+                numberFormatSubpattern += '#';
+                ++fractionDigits;
+            }
+        }
+
+        var integerDigits = 0;
+        var requiredDigits = Math.max(this.minimumIntegerDigits, 1);
+
+        if(this.primaryGroupingSize)
+            requiredDigits = Math.max(this.minimumIntegerDigits, this.primaryGroupingSize + (this.secondaryGroupingSize ? this.secondaryGroupingSize : 0) + 1);
+
+        while(integerDigits < requiredDigits)
+        {
+            if(this.primaryGroupingSize)
+            {
+                if(integerDigits == this.primaryGroupingSize ||
+                   (this.secondaryGroupingSize && integerDigits == this.primaryGroupingSize + this.secondaryGroupingSize))
+                    numberFormatSubpattern = ',' + numberFormatSubpattern;
+            }
+
+            numberFormatSubpattern = (integerDigits < this.minimumIntegerDigits ? '0' : '#') + numberFormatSubpattern;
+            ++integerDigits;
+        }
+
+        if(this.prefix)
+            numberFormatSubpattern = this.prefix + numberFormatSubpattern;
+
+        if(this.suffix)
+            numberFormatSubpattern += this.suffix;
+
+        return numberFormatPattern;
+    };  
 })();
 
 function numberFormatPattern(
@@ -591,6 +640,11 @@ numberFormatPattern.prototype.regexes = function()
     return regexes;
 };
 
+numberFormatPattern.prototype.toString = function()
+{
+    return this.positive.toString() + (this.negative ? ';' + this.negative.toString() : '');
+};
+    
 function numberFormatSpecification(
     minimumIntegerDigits,
     minimumFractionDigits,
