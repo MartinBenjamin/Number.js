@@ -425,6 +425,138 @@
     };
 })();
 
+function numberFormatSubpattern(
+    minimumIntegerDigits,
+    minimumFractionDigits,
+    maximumFractionDigits,
+    primaryGroupingSize,
+    secondaryGroupingSize
+    )
+{
+    this.minimumIntegerDigits  = minimumIntegerDigits;
+    this.minimumFractionDigits = minimumFractionDigits;
+    this.maximumFractionDigits = maximumFractionDigits;
+    this.primaryGroupingSize   = primaryGroupingSize;
+    this.secondaryGroupingSize = secondaryGroupingSize;
+}
+
+(function()
+{
+    var syntaxCharacters = /[\^$\\.*+?()[\]{}|]/g;
+    var localizedReplacements = {
+        '+': Number.symbols.plusSign,
+        '-': Number.symbols.minusSign
+    };
+
+    numberFormatSubpattern.prototype.fractionRegex = function()
+    {
+        var decimalRegex = Number.symbols.decimal.replace(
+            syntaxCharacters,
+            '\\$&');
+
+        var fractionRegex = '';
+        if(this.maximumFractionDigits)
+        {
+            if(this.minimumFractionDigits === 0)
+                fractionRegex = '(' + decimalRegex + '\\d{1,' + this.maximumFractionDigits + '})?';
+
+            else if(this.minimumFractionDigits < this.maximumFractionDigits)
+                fractionRegex = decimalRegex + '\\d{' + this.minimumFractionDigits + ',' + this.maximumFractionDigits + '}';
+
+            else
+                fractionRegex = decimalRegex + '\\d{' + this.maximumFractionDigits + '}';
+        }
+        
+        return fractionRegex;
+    };
+
+    numberFormatSubpattern.prototype.integerRegex = function()
+    {
+        var groupRegex = Number.symbols.group.replace(
+            syntaxCharacters,
+            '\\$&');
+ 
+        var integerRegex = ''
+        if(!this.primaryGroupingSize)
+            integerRegex = '([1-9]\\d*)?\\d{' + this.minimumIntegerDigits + '}';
+
+        else
+        {
+            var secondaryGroupingSize = this.secondaryGroupingSize ? this.secondaryGroupingSize : this.primaryGroupingSize;
+
+            var groupSize = this.primaryGroupingSize;
+            var minimumIntegerDigits = this.minimumIntegerDigits;
+            var secondary = false;
+
+            while(minimumIntegerDigits >= groupSize)
+            {
+                integerRegex = secondary ? groupRegex + integerRegex : integerRegex;
+                integerRegex = '\\d{' + groupSize + '}' + integerRegex;
+                minimumIntegerDigits -= groupSize;
+                groupSize = secondaryGroupingSize;
+                secondary = true;
+            }
+
+            if(minimumIntegerDigits)
+                integerRegex = '(' +
+                    [
+                        '[1-9]\\d{0,' + (secondaryGroupingSize - 1) + '}' + groupRegex + '(\\d{' + secondaryGroupingSize + '}' + groupRegex + ')*' + '\\d{' + (groupSize - minimumIntegerDigits) + '}',
+                        '[1-9]\\d{0,' + (groupSize - minimumIntegerDigits - 1) + '}',
+                        ''
+                    ].join('|') +
+                    ')' +
+                    '\\d{' + minimumIntegerDigits + '}' + (secondary ? groupRegex + integerRegex : integerRegex);
+
+            else
+                integerRegex = '(' +
+                    [
+                        '[1-9]\\d{0,' + (secondaryGroupingSize - 1) + '}' + groupRegex + '(\\d{' + secondaryGroupingSize + '}' + groupRegex + ')*',
+                        ''
+                    ].join('|') +
+                    ')' +
+                    integerRegex;
+        }
+
+        return integerRegex;
+    };
+
+    numberFormatSubpattern.prototype.numberRegex = function()
+    {
+        return this.integerRegex() + this.fractionRegex();
+    };
+
+    function affixRegex(
+        affix
+        )
+    {
+        return !affix ? '' : affix.split('').map(
+            function(
+                affixChar
+                )
+            {
+                return affixChar in localizedReplacements ? localizedReplacements[affixChar] : affixChar;
+            }).join('').replace(
+            syntaxCharacters,
+            '\\$&');
+    }
+
+    numberFormatSubpattern.prototype.regex = function(
+        affixes
+        )
+    {
+        return affixRegex(affixes.prefix) + this.numberRegex() + affixRegex(affixes.suffix);
+    };
+})();
+
+function numberFormatPattern(
+    positiveSubpattern,
+    negativeSubpattern
+    )
+{
+    this.positive = positiveSubpattern;
+    this.negative = negativeSubpattern;
+}
+
 function numberFormatSpecification(
     minimumIntegerDigits,
     minimumFractionDigits,
