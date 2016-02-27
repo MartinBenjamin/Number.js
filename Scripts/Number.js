@@ -827,56 +827,58 @@ for(var ruleName in numberFormatPatternRules)
 }
 
 function parseNumberFormatPattern(
-    numberFormatPattern
+    pattern
     )
 {
-    var pattern = numberFormatPatternRules.pattern.parse(
-        numberFormatPattern,
+    var patternMatch = numberFormatPatternRules.pattern.parse(
+        pattern,
         0);
 
-    if(!pattern)
+    if(!patternMatch)
         return null;
 
-    function buildNumberFormatSpecification(
-        subpattern
+    function buildSubpattern(
+        subpatternMatch
         )
     {
-        var specification = new numberFormatSpecification(0, 0, 0);
-        var integer  = subpattern.select(function(m) { return m.ruleName == 'integer'; })[0];
-        var fraction = subpattern.select(function(m) { return m.ruleName == 'fraction'; })[0];
-        var prefix   = subpattern.select(function(m) { return m.ruleName == 'prefix'; });
-        var suffix   = subpattern.select(function(m) { return m.ruleName == 'suffix'; });
-        specification.minimumIntegerDigits = integer.select(function(m) { return m.ruleName == 'zero'; }).length;
+        var subpattern = new numberFormatSubpattern(0, 0, 0);
+        var integerMatch  = subpatternMatch.select(function(m) { return m.ruleName == 'integer';  })[0];
+        var fractionMatch = subpatternMatch.select(function(m) { return m.ruleName == 'fraction'; })[0];
+        var prefixMatch   = subpatternMatch.select(function(m) { return m.ruleName == 'prefix';   })[0];
+        var suffixMatch   = subpatternMatch.select(function(m) { return m.ruleName == 'suffix';   })[0];
+        subpattern.minimumIntegerDigits = integerMatch.select(function(m) { return m.ruleName == 'zero'; }).length;
 
-        if(fraction)
+        if(fractionMatch)
         {
-            specification.minimumFractionDigits = fraction.select(function(m) { return m.ruleName == 'zero'; }).length;
-            specification.maximumFractionDigits = specification.minimumFractionDigits + fraction.select(function(m) { return m.ruleName == 'hash'; }).length;
+            subpattern.minimumFractionDigits = fractionMatch.select(function(m) { return m.ruleName == 'zero'; }).length;
+            subpattern.maximumFractionDigits = subpattern.minimumFractionDigits + fractionMatch.select(function(m) { return m.ruleName == 'hash'; }).length;
         }
 
-        var groups = integer.getValue().split(',').reverse();
+        var groups = integerMatch.getValue().split(',').reverse();
         if(groups.length > 1)
-            specification.primaryGroupingSize = groups[0].length;
+            subpattern.primaryGroupingSize = groups[0].length;
 
         if(groups.length > 2)
-            specification.secondaryGroupingSize = groups[1].length;
+            subpattern.secondaryGroupingSize = groups[1].length;
 
-        if(prefix.length)
-            specification.prefix = prefix[0].getValue();
+        if(prefixMatch)
+            subpattern.prefix = prefixMatch.getValue();
 
-        if(suffix.length)
-            specification.suffix = suffix[0].getValue();
+        if(suffixMatch)
+            subpattern.suffix = suffixMatch.getValue();
 
-        return specification;
+        return subpattern;
     }
 
-    var subpatterns = pattern.select(function(m) { return m.ruleName == 'subpattern'; });
-    var specification = buildNumberFormatSpecification(subpatterns[0]);
+    var subpatternMatches = patternMatch.select(function(m) { return m.ruleName == 'subpattern'; });
+    var positiveSubpattern = buildSubpattern(subpatternMatches[0]);
+    
+    pattern = new numberFormatPattern(positiveSubpattern);
 
-    if(subpatterns.length == 2)
-        specification.negative = buildNumberFormatSpecification(subpatterns[1]);
+    if(subpatternMatches.length == 2)
+        pattern.negative = buildSubpattern(subpatternMatches[1]);
 
-    return specification;
+    return pattern;
 }
 
 function formatNumber(

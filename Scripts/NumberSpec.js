@@ -188,11 +188,11 @@ describe(
                 data
                 )
             {
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').minimumIntegerDigits" , data[1].minimumIntegerDigits );
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').primaryGroupingSize"  , data[1].primaryGroupingSize  );
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').secondaryGroupingSize", data[1].secondaryGroupingSize);
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').minimumFractionDigits", data[1].minimumFractionDigits);
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').maximumFractionDigits", data[1].maximumFractionDigits);
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.minimumIntegerDigits" , data[1].minimumIntegerDigits );
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.primaryGroupingSize"  , data[1].primaryGroupingSize  );
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.secondaryGroupingSize", data[1].secondaryGroupingSize);
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.minimumFractionDigits", data[1].minimumFractionDigits);
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.maximumFractionDigits", data[1].maximumFractionDigits);
             });
 
         testData.map(
@@ -206,12 +206,12 @@ describe(
                 data
                 )
             {
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').prefix"               , "'A'"                        );
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').minimumIntegerDigits" , data[1].minimumIntegerDigits );
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').primaryGroupingSize"  , data[1].primaryGroupingSize  );
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').secondaryGroupingSize", data[1].secondaryGroupingSize);
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').minimumFractionDigits", data[1].minimumFractionDigits);
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').maximumFractionDigits", data[1].maximumFractionDigits);
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.prefix"               , "'A'"                        );
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.minimumIntegerDigits" , data[1].minimumIntegerDigits );
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.primaryGroupingSize"  , data[1].primaryGroupingSize  );
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.secondaryGroupingSize", data[1].secondaryGroupingSize);
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.minimumFractionDigits", data[1].minimumFractionDigits);
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.maximumFractionDigits", data[1].maximumFractionDigits);
             });
 
         testData.map(
@@ -225,12 +225,12 @@ describe(
                 data
                 )
             {
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').suffix"               , "'A'"                        );
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').minimumIntegerDigits" , data[1].minimumIntegerDigits );
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').primaryGroupingSize"  , data[1].primaryGroupingSize  );
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').secondaryGroupingSize", data[1].secondaryGroupingSize);
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').minimumFractionDigits", data[1].minimumFractionDigits);
-                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').maximumFractionDigits", data[1].maximumFractionDigits);
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.suffix"               , "'A'"                        );
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.minimumIntegerDigits" , data[1].minimumIntegerDigits );
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.primaryGroupingSize"  , data[1].primaryGroupingSize  );
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.secondaryGroupingSize", data[1].secondaryGroupingSize);
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.minimumFractionDigits", data[1].minimumFractionDigits);
+                assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').positive.maximumFractionDigits", data[1].maximumFractionDigits);
             });
 
 
