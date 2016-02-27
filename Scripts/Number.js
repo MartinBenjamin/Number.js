@@ -544,6 +544,7 @@ function numberFormatSubpattern(
         affixes
         )
     {
+        affixes = affixes ? affixes : this;
         return affixRegex(affixes.prefix) + this.numberRegex() + affixRegex(affixes.suffix);
     };
 })();
@@ -556,6 +557,39 @@ function numberFormatPattern(
     this.positive = positiveSubpattern;
     this.negative = negativeSubpattern;
 }
+
+numberFormatPattern.prototype.positiveSubpatternRegex = function()
+{
+    return this.positive.regex();
+};
+ 
+numberFormatPattern.prototype.negativeSubpatternRegex = function()
+{
+    var minusRegex = Number.symbols.minusSign.replace(
+        syntaxCharacters,
+        '\\$&');
+
+    if(!this.negative)
+        return minusRegex + this.positive.regex();
+
+    return this.positive.regex(this.negative);
+};
+
+numberFormatPattern.prototype.regexes = function()
+{
+    var regexes =
+    {
+        positive: this.positiveSubpatternRegex(),
+        negative: this.negativeSubpatternRegex()
+    };
+
+    for(var polarity in regexes)
+        regexes[polarity] = new RegExp(
+        '^' + regexes[polarity] + '$',
+        'g');
+
+    return regexes;
+};
 
 function numberFormatSpecification(
     minimumIntegerDigits,
@@ -695,7 +729,7 @@ function numberFormatSpecification(
 
         return this.subpatternRegex(this.negative);
     };
-    
+
     numberFormatSpecification.prototype.regexes = function()
     {
         var regexes =
