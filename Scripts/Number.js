@@ -529,7 +529,7 @@ function numberFormatSpecification(
         affix
         )
     {
-        return affix.split('').map(
+        return !affix ? '' : affix.split('').map(
             function(
                 affixChar
                 )
@@ -540,28 +540,16 @@ function numberFormatSpecification(
             '\\$&');
     }
 
-    function subpatternRegex(
-        numberFormatSpecification,
-        numberRegex
+    numberFormatSpecification.prototype.subpatternRegex = function(
+        affixes
         )
     {
-        var prefixRegex = '';
-        var suffixRegex = '';
-
-        if(numberFormatSpecification.prefix)
-            prefixRegex = affixRegex(numberFormatSpecification.prefix);
-
-        if(numberFormatSpecification.suffix)
-            suffixRegex = affixRegex(numberFormatSpecification.suffix);
-
-        return prefixRegex + numberRegex + suffixRegex;
+        return affixRegex(affixes.prefix) + this.numberRegex() + affixRegex(affixes.suffix);
     }
 
     numberFormatSpecification.prototype.positiveSubpatternRegex = function()
     {
-        return subpatternRegex(
-            this,
-            this.numberRegex())
+        return this.subpatternRegex(this);
     };
  
     numberFormatSpecification.prototype.negativeSubpatternRegex = function()
@@ -571,13 +559,9 @@ function numberFormatSpecification(
             '\\$&');
 
         if(!this.negative)
-            return minusRegex + subpatternRegex(
-                this,
-                this.numberRegex());
+            return minusRegex + this.subpatternRegex(this);
 
-        return subpatternRegex(
-            this.negative,
-            this.numberRegex());
+        return this.subpatternRegex(this.negative);
     };
     
     numberFormatSpecification.prototype.regexes = function()
