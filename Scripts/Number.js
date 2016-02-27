@@ -446,6 +446,36 @@ numberFormatSpecification.prototype.format = function(
 {
     var specification = this;
     var transformations = [];
+
+    var affixes =
+    {
+        positive:
+        {
+            prefix: specification.prefix ? specification.prefix : '',
+            suffix: specification.suffix ? specification.suffix : ''
+        },
+        negative:
+        {
+            prefix: specification.negative ? (specification.negative.prefix ? specification.negative.prefix : '') : '-',
+            suffix: specification.negative && specification.negative.suffix ? specification.negative.suffix : ''
+        }
+    };
+
+    var localizedReplacements = {
+        '+': Number.symbols.plusSign,
+        '-': Number.symbols.minusSign
+    };
+	
+    for(var polarity in affixes)
+        for(var affix in affixes[polarity])
+            affixes[polarity][affix] = affixes[polarity][affix].split('').map(
+                        function(
+                            char
+                            )
+                        {
+                            return char in localizedReplacements ? localizedReplacements[char] : char;
+                        }).join('');
+
     transformations.push(
         function(
             number
@@ -458,7 +488,7 @@ numberFormatSpecification.prototype.format = function(
                 /^0+/,
                 '');
             return {
-                positive: positive,
+                affixes : positive ? affixes.positive : affixes.negative,
                 integer : components[0],
                 fraction: components.length > 1 ? components[1] : ''
             };
@@ -474,7 +504,7 @@ numberFormatSpecification.prototype.format = function(
             )
         {
             return {
-                positive: number.positive,
+                affixes : number.affixes,
                 integer : padding.substring(number.integer.length) + number.integer,
                 fraction: number.fraction
             };
@@ -492,7 +522,7 @@ numberFormatSpecification.prototype.format = function(
                 )
             {
                 return {
-                    positive: number.positive,
+                    affixes : number.affixes,
                     integer : number.integer.replace(
                         regex,
                         '$1' + Number.symbols.group),
@@ -513,7 +543,7 @@ numberFormatSpecification.prototype.format = function(
                 )
             {
                 return {
-                    positive: number.positive,
+                    affixes : number.affixes,
                     integer : number.integer,
                     fraction: number.fraction.replace(
                         regex,
@@ -521,60 +551,16 @@ numberFormatSpecification.prototype.format = function(
                 };
             });
     }
-
-    var positiveAffixes =
-    {
-        prefix: specification.prefix ? specification.prefix : '',
-        suffix: specification.suffix ? specification.suffix : ''
-    };
-    
-	var negativeAffixes =
-    {
-        prefix: specification.negative ? (specification.negative.prefix ? specification.negative.prefix : '') : '-',
-        suffix: specification.negative && specification.negative.suffix ? specification.negative.suffix : ''
-    };
-
-    var localizedReplacements = {
-        '+': Number.symbols.plusSign,
-        '-': Number.symbols.minusSign
-    };
-	
-    [
-        positiveAffixes,
-        negativeAffixes
-    ].forEach(
-        function(
-            affixes
-            )
-        {
-            [
-                'prefix',
-                'suffix'
-            ].forEach(
-                function(
-                    affix
-                    )
-                {
-                    affixes[affix] = affixes[affix].split('').map(
-                        function(
-                            char
-                            )
-                        {
-                            return char in localizedReplacements ? localizedReplacements[char] : char;
-                        }).join('');
-                });
-        });
     
     transformations.push(
         function(
             number
             )
         {
-            var affixes = number.positive ? positiveAffixes : negativeAffixes;
-            return affixes.prefix +
+            return number.affixes.prefix +
                 number.integer +
                 (number.fraction.length ? Number.symbols.decimal + number.fraction : '') +
-                affixes.suffix;
+                number.affixes.suffix;
         });
 
     function format(
