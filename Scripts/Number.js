@@ -595,27 +595,6 @@ function numberFormatSpecification(
 
         return regexes;
     };
-    
-    numberFormatSpecification.prototype.parse = function(
-        value
-        )
-    {
-        var regexes = this.regexes();
-        function parse(
-            value
-            )
-        {
-            if(value.match(regexes.positive))
-                return Number(value.replace(/[^0-9.]/g, ''));
-
-            if(value.match(regexes.negative))
-                return -Number(value.replace(/[^0-9.]/g, ''));
-
-            return NaN;
-        }
-
-        return typeof value == 'undefined' ? parse : parse(value);
-    };
 
     numberFormatSpecification.prototype.toString = function()
     {
@@ -897,5 +876,20 @@ function parseNumber(
     value
     )
 {
-    return parseNumberFormatPattern(numberFormatPattern).parse(value);
+    var specification = parseNumberFormatPattern(numberFormatPattern);
+    var regexes = specification.regexes();
+    function parse(
+        value
+        )
+    {
+        if(value.match(regexes.positive))
+            return Number(value.replace(/[^0-9.]/g, ''));
+
+        if(value.match(regexes.negative))
+            return -Number(value.replace(/[^0-9.]/g, ''));
+
+        return NaN;
+    }
+
+    return typeof value == 'undefined' ? parse : parse(value);
 }
