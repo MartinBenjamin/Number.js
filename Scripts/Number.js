@@ -522,38 +522,59 @@ numberFormatSpecification.prototype.format = function(
             });
     }
 
-    var positive =
+    var positiveAffixes =
     {
         prefix: specification.prefix ? specification.prefix : '',
         suffix: specification.suffix ? specification.suffix : ''
     };
-    var negative =
+    
+	var negativeAffixes =
     {
         prefix: specification.negative ? (specification.negative.prefix ? specification.negative.prefix : '') : '-',
         suffix: specification.negative && specification.negative.suffix ? specification.negative.suffix : ''
     };
 
+    var localizedReplacements = {
+        '+': Number.symbols.plusSign,
+        '-': Number.symbols.minusSign
+    };
+	
+    [
+        positiveAffixes,
+        negativeAffixes
+    ].forEach(
+        function(
+            affixes
+            )
+        {
+            [
+                'prefix',
+                'suffix'
+            ].forEach(
+                function(
+                    affix
+                    )
+                {
+                    affixes[affix] = affixes[affix].split('').map(
+                        function(
+                            char
+                            )
+                        {
+                            return char in localizedReplacements ? localizedReplacements[char] : char;
+                        }).join('');
+                });
+        });
+    
     transformations.push(
         function(
             number
             )
         {
-            var affixes = number.positive ? positive : negative;
-            var formattedNumber =
-                affixes.prefix +
+            var affixes = number.positive ? positiveAffixes : negativeAffixes;
+            return affixes.prefix +
                 number.integer +
                 (number.fraction.length ? Number.symbols.decimal + number.fraction : '') +
                 affixes.suffix;
-
-            formattedNumber = formattedNumber.replace(
-                '+',
-                Number.symbols.plusSign)
-
-            formattedNumber = formattedNumber.replace(
-                '-',
-                Number.symbols.minusSign)
-
-            return formattedNumber;
         });
 
     function format(
