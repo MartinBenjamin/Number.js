@@ -550,21 +550,21 @@ function numberFormatSubpattern(
 
     numberFormatSubpattern.prototype.toString = function()
     {
-        var numberFormatSubpattern = '';
+        var subpattern = '';
 
         if(this.maximumFractionDigits)
         {
-            numberFormatSubpattern += '.';
+            subpattern += '.';
             var fractionDigits = 0;
             while(fractionDigits < this.minimumFractionDigits)
             {
-                numberFormatSubpattern += '0';
+                subpattern += '0';
                 ++fractionDigits;
             }
 
             while(fractionDigits < this.maximumFractionDigits)
             {
-                numberFormatSubpattern += '#';
+                subpattern += '#';
                 ++fractionDigits;
             }
         }
@@ -581,20 +581,20 @@ function numberFormatSubpattern(
             {
                 if(integerDigits == this.primaryGroupingSize ||
                    (this.secondaryGroupingSize && integerDigits == this.primaryGroupingSize + this.secondaryGroupingSize))
-                    numberFormatSubpattern = ',' + numberFormatSubpattern;
+                    subpattern = ',' + subpattern;
             }
 
-            numberFormatSubpattern = (integerDigits < this.minimumIntegerDigits ? '0' : '#') + numberFormatSubpattern;
+            subpattern = (integerDigits < this.minimumIntegerDigits ? '0' : '#') + subpattern;
             ++integerDigits;
         }
 
         if(this.prefix)
-            numberFormatSubpattern = this.prefix + numberFormatSubpattern;
+            subpattern = this.prefix + subpattern;
 
         if(this.suffix)
-            numberFormatSubpattern += this.suffix;
+            subpattern += this.suffix;
 
-        return numberFormatPattern;
+        return subpattern;
     };  
 })();
 
