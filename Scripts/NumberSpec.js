@@ -180,7 +180,6 @@ describe(
     'parseNumberFormatPattern',
     function()
     {
-        return;
         assert.strictEquals("typeof parseNumberFormatPattern", "'function'");
         assert.strictEquals("typeof Number.symbols", "'object'");
 
@@ -378,7 +377,6 @@ describe(
     'formatNumber',
     function()
     {
-        return;
         assert.strictEquals("typeof formatNumber", "'function'");
 
         var testData =
@@ -592,7 +590,6 @@ describe(
     'parseNumber',
     function()
     {
-        return;
         assert.strictEquals("parseNumber('0', '0')", 0);
         assert.strictEquals("parseNumber('0', '1')", 1);
         assert.strictEquals("parseNumber('0', '-1')", -1);
