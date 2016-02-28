@@ -440,6 +440,15 @@ function numberFormatSubpattern(
     this.secondaryGroupingSize = secondaryGroupingSize;
 }
 
+function numberFormatPattern(
+    positiveSubpattern,
+    negativeSubpattern
+    )
+{
+    this.positive = positiveSubpattern;
+    this.negative = negativeSubpattern;
+}
+
 (function()
 {
     var syntaxCharacters = /[\^$\\.*+?()[\]{}|]/g;
@@ -595,55 +604,46 @@ function numberFormatSubpattern(
             subpattern += this.suffix;
 
         return subpattern;
-    };  
-})();
+    }; 
 
-function numberFormatPattern(
-    positiveSubpattern,
-    negativeSubpattern
-    )
-{
-    this.positive = positiveSubpattern;
-    this.negative = negativeSubpattern;
-}
-
-numberFormatPattern.prototype.positiveSubpatternRegex = function()
-{
-    return this.positive.regex();
-};
- 
-numberFormatPattern.prototype.negativeSubpatternRegex = function()
-{
-    var minusRegex = Number.symbols.minusSign.replace(
-        syntaxCharacters,
-        '\\$&');
-
-    if(!this.negative)
-        return minusRegex + this.positive.regex();
-
-    return this.positive.regex(this.negative);
-};
-
-numberFormatPattern.prototype.regexes = function()
-{
-    var regexes =
+    numberFormatPattern.prototype.positiveSubpatternRegex = function()
     {
-        positive: this.positiveSubpatternRegex(),
-        negative: this.negativeSubpatternRegex()
+        return this.positive.regex();
+    };
+     
+    numberFormatPattern.prototype.negativeSubpatternRegex = function()
+    {
+        var minusRegex = Number.symbols.minusSign.replace(
+            syntaxCharacters,
+            '\\$&');
+
+        if(!this.negative)
+            return minusRegex + this.positive.regex();
+
+        return this.positive.regex(this.negative);
     };
 
-    for(var polarity in regexes)
-        regexes[polarity] = new RegExp(
-        '^' + regexes[polarity] + '$',
-        'g');
+    numberFormatPattern.prototype.regexes = function()
+    {
+        var regexes =
+        {
+            positive: this.positiveSubpatternRegex(),
+            negative: this.negativeSubpatternRegex()
+        };
 
-    return regexes;
-};
+        for(var polarity in regexes)
+            regexes[polarity] = new RegExp(
+            '^' + regexes[polarity] + '$',
+            'g');
 
-numberFormatPattern.prototype.toString = function()
-{
-    return this.positive.toString() + (this.negative ? ';' + this.negative.toString() : '');
-};
+        return regexes;
+    };
+
+    numberFormatPattern.prototype.toString = function()
+    {
+        return this.positive.toString() + (this.negative ? ';' + this.negative.toString() : '');
+    };
+})();
     
 function numberFormatSpecification(
     minimumIntegerDigits,
@@ -1084,8 +1084,8 @@ function parseNumber(
     value
     )
 {
-    var specification = parseNumberFormatPattern(numberFormatPattern);
-    var regexes = specification.regexes();
+    var pattern = parseNumberFormatPattern(numberFormatPattern);
+    var regexes = pattern.regexes();
     function parse(
         value
         )
