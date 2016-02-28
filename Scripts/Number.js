@@ -425,7 +425,7 @@
     };
 })();
 
-function numberFormatSpecification(
+function numberFormatSubpattern(
     minimumIntegerDigits,
     minimumFractionDigits,
     maximumFractionDigits,
@@ -440,6 +440,15 @@ function numberFormatSpecification(
     this.secondaryGroupingSize = secondaryGroupingSize;
 }
 
+function numberFormatPattern(
+    positiveSubpattern,
+    negativeSubpattern
+    )
+{
+    this.positive = positiveSubpattern;
+    this.negative = negativeSubpattern;
+}
+
 (function()
 {
     var syntaxCharacters = /[\^$\\.*+?()[\]{}|]/g;
@@ -448,7 +457,7 @@ function numberFormatSpecification(
         '-': Number.symbols.minusSign
     };
 
-    numberFormatSpecification.prototype.fractionRegex = function()
+    numberFormatSubpattern.prototype.fractionRegex = function()
     {
         var decimalRegex = Number.symbols.decimal.replace(
             syntaxCharacters,
@@ -470,7 +479,7 @@ function numberFormatSpecification(
         return fractionRegex;
     };
 
-    numberFormatSpecification.prototype.integerRegex = function()
+    numberFormatSubpattern.prototype.integerRegex = function()
     {
         var groupRegex = Number.symbols.group.replace(
             syntaxCharacters,
@@ -520,7 +529,7 @@ function numberFormatSpecification(
         return integerRegex;
     };
 
-    numberFormatSpecification.prototype.numberRegex = function()
+    numberFormatSubpattern.prototype.numberRegex = function()
     {
         return this.integerRegex() + this.fractionRegex();
     };
@@ -540,63 +549,31 @@ function numberFormatSpecification(
             '\\$&');
     }
 
-    numberFormatSpecification.prototype.subpatternRegex = function(
+    numberFormatSubpattern.prototype.regex = function(
         affixes
         )
     {
+        affixes = affixes ? affixes : this;
         return affixRegex(affixes.prefix) + this.numberRegex() + affixRegex(affixes.suffix);
-    }
-
-    numberFormatSpecification.prototype.positiveSubpatternRegex = function()
-    {
-        return this.subpatternRegex(this);
-    };
- 
-    numberFormatSpecification.prototype.negativeSubpatternRegex = function()
-    {
-        var minusRegex = Number.symbols.minusSign.replace(
-            syntaxCharacters,
-            '\\$&');
-
-        if(!this.negative)
-            return minusRegex + this.subpatternRegex(this);
-
-        return this.subpatternRegex(this.negative);
-    };
-    
-    numberFormatSpecification.prototype.regexes = function()
-    {
-        var regexes =
-        {
-            positive: this.positiveSubpatternRegex(),
-            negative: this.negativeSubpatternRegex()
-        };
-
-        for(var polarity in regexes)
-            regexes[polarity] = new RegExp(
-            '^' + regexes[polarity] + '$',
-            'g');
-
-        return regexes;
     };
 
-    numberFormatSpecification.prototype.toString = function()
+    numberFormatSubpattern.prototype.toString = function()
     {
-        var numberFormatPattern = '';
+        var subpattern = '';
 
         if(this.maximumFractionDigits)
         {
-            numberFormatPattern += '.';
+            subpattern += '.';
             var fractionDigits = 0;
             while(fractionDigits < this.minimumFractionDigits)
             {
-                numberFormatPattern += '0';
+                subpattern += '0';
                 ++fractionDigits;
             }
 
             while(fractionDigits < this.maximumFractionDigits)
             {
-                numberFormatPattern += '#';
+                subpattern += '#';
                 ++fractionDigits;
             }
         }
@@ -613,21 +590,59 @@ function numberFormatSpecification(
             {
                 if(integerDigits == this.primaryGroupingSize ||
                    (this.secondaryGroupingSize && integerDigits == this.primaryGroupingSize + this.secondaryGroupingSize))
-                    numberFormatPattern = ',' + numberFormatPattern;
+                    subpattern = ',' + subpattern;
             }
 
-            numberFormatPattern = (integerDigits < this.minimumIntegerDigits ? '0' : '#') + numberFormatPattern;
+            subpattern = (integerDigits < this.minimumIntegerDigits ? '0' : '#') + subpattern;
             ++integerDigits;
         }
 
         if(this.prefix)
-            numberFormatPattern = this.prefix + numberFormatPattern;
+            subpattern = this.prefix + subpattern;
 
         if(this.suffix)
-            numberFormatPattern += this.suffix;
+            subpattern += this.suffix;
 
-        return numberFormatPattern + (this.negative ? ';' + this.negative.toString() : '');
-    };  
+        return subpattern;
+    }; 
+
+    numberFormatPattern.prototype.positiveSubpatternRegex = function()
+    {
+        return this.positive.regex();
+    };
+     
+    numberFormatPattern.prototype.negativeSubpatternRegex = function()
+    {
+        var minusRegex = Number.symbols.minusSign.replace(
+            syntaxCharacters,
+            '\\$&');
+
+        if(!this.negative)
+            return minusRegex + this.positive.regex();
+
+        return this.positive.regex(this.negative);
+    };
+
+    numberFormatPattern.prototype.regexes = function()
+    {
+        var regexes =
+        {
+            positive: this.positiveSubpatternRegex(),
+            negative: this.negativeSubpatternRegex()
+        };
+
+        for(var polarity in regexes)
+            regexes[polarity] = new RegExp(
+            '^' + regexes[polarity] + '$',
+            'g');
+
+        return regexes;
+    };
+
+    numberFormatPattern.prototype.toString = function()
+    {
+        return this.positive.toString() + (this.negative ? ';' + this.negative.toString() : '');
+    };
 })();
 
 var numberFormatPatternRules;
@@ -661,56 +676,58 @@ for(var ruleName in numberFormatPatternRules)
 }
 
 function parseNumberFormatPattern(
-    numberFormatPattern
+    pattern
     )
 {
-    var pattern = numberFormatPatternRules.pattern.parse(
-        numberFormatPattern,
+    var patternMatch = numberFormatPatternRules.pattern.parse(
+        pattern,
         0);
 
-    if(!pattern)
+    if(!patternMatch)
         return null;
 
-    function buildNumberFormatSpecification(
-        subpattern
+    function buildSubpattern(
+        subpatternMatch
         )
     {
-        var specification = new numberFormatSpecification(0, 0, 0);
-        var integer  = subpattern.select(function(m) { return m.ruleName == 'integer'; })[0];
-        var fraction = subpattern.select(function(m) { return m.ruleName == 'fraction'; })[0];
-        var prefix   = subpattern.select(function(m) { return m.ruleName == 'prefix'; });
-        var suffix   = subpattern.select(function(m) { return m.ruleName == 'suffix'; });
-        specification.minimumIntegerDigits = integer.select(function(m) { return m.ruleName == 'zero'; }).length;
+        var subpattern = new numberFormatSubpattern(0, 0, 0);
+        var integerMatch  = subpatternMatch.select(function(m) { return m.ruleName == 'integer';  })[0];
+        var fractionMatch = subpatternMatch.select(function(m) { return m.ruleName == 'fraction'; })[0];
+        var prefixMatch   = subpatternMatch.select(function(m) { return m.ruleName == 'prefix';   })[0];
+        var suffixMatch   = subpatternMatch.select(function(m) { return m.ruleName == 'suffix';   })[0];
+        subpattern.minimumIntegerDigits = integerMatch.select(function(m) { return m.ruleName == 'zero'; }).length;
 
-        if(fraction)
+        if(fractionMatch)
         {
-            specification.minimumFractionDigits = fraction.select(function(m) { return m.ruleName == 'zero'; }).length;
-            specification.maximumFractionDigits = specification.minimumFractionDigits + fraction.select(function(m) { return m.ruleName == 'hash'; }).length;
+            subpattern.minimumFractionDigits = fractionMatch.select(function(m) { return m.ruleName == 'zero'; }).length;
+            subpattern.maximumFractionDigits = subpattern.minimumFractionDigits + fractionMatch.select(function(m) { return m.ruleName == 'hash'; }).length;
         }
 
-        var groups = integer.getValue().split(',').reverse();
+        var groups = integerMatch.getValue().split(',').reverse();
         if(groups.length > 1)
-            specification.primaryGroupingSize = groups[0].length;
+            subpattern.primaryGroupingSize = groups[0].length;
 
         if(groups.length > 2)
-            specification.secondaryGroupingSize = groups[1].length;
+            subpattern.secondaryGroupingSize = groups[1].length;
 
-        if(prefix.length)
-            specification.prefix = prefix[0].getValue();
+        if(prefixMatch)
+            subpattern.prefix = prefixMatch.getValue();
 
-        if(suffix.length)
-            specification.suffix = suffix[0].getValue();
+        if(suffixMatch)
+            subpattern.suffix = suffixMatch.getValue();
 
-        return specification;
+        return subpattern;
     }
 
-    var subpatterns = pattern.select(function(m) { return m.ruleName == 'subpattern'; });
-    var specification = buildNumberFormatSpecification(subpatterns[0]);
+    var subpatternMatches = patternMatch.select(function(m) { return m.ruleName == 'subpattern'; });
+    var positiveSubpattern = buildSubpattern(subpatternMatches[0]);
+    
+    pattern = new numberFormatPattern(positiveSubpattern);
 
-    if(subpatterns.length == 2)
-        specification.negative = buildNumberFormatSpecification(subpatterns[1]);
+    if(subpatternMatches.length == 2)
+        pattern.negative = buildSubpattern(subpatternMatches[1]);
 
-    return specification;
+    return pattern;
 }
 
 function formatNumber(
@@ -718,20 +735,22 @@ function formatNumber(
     number
     )
 {
-    var specification = parseNumberFormatPattern(numberFormatPattern);
+    var pattern = parseNumberFormatPattern(numberFormatPattern);
+    var positiveSubpattern = pattern.positive;
+    var negativeSubpattern = pattern.negative;
     var transformations = [];
 
     var affixes =
     {
         positive:
         {
-            prefix: specification.prefix ? specification.prefix : '',
-            suffix: specification.suffix ? specification.suffix : ''
+            prefix: positiveSubpattern.prefix ? positiveSubpattern.prefix : '',
+            suffix: positiveSubpattern.suffix ? positiveSubpattern.suffix : ''
         },
         negative:
         {
-            prefix: specification.negative ? (specification.negative.prefix ? specification.negative.prefix : '') : '-',
-            suffix: specification.negative && specification.negative.suffix ? specification.negative.suffix : ''
+            prefix: negativeSubpattern ? (negativeSubpattern.prefix ? negativeSubpattern.prefix : '') : '-',
+            suffix: negativeSubpattern && negativeSubpattern.suffix ? negativeSubpattern.suffix : ''
         }
     };
 
@@ -757,7 +776,7 @@ function formatNumber(
         {
             var positive = number >= 0;
             number = positive ? number : -number;
-            var components = number.toFixed(specification.maximumFractionDigits).split('.');
+            var components = number.toFixed(positiveSubpattern.maximumFractionDigits).split('.');
             components[0] = components[0].replace(
                 /^0+/,
                 '');
@@ -769,7 +788,7 @@ function formatNumber(
         });
 
     var padding = '';
-    while(padding.length < specification.minimumIntegerDigits)
+    while(padding.length < positiveSubpattern.minimumIntegerDigits)
         padding += '0';
 
     transformations.push(
@@ -784,10 +803,10 @@ function formatNumber(
             };
         });
 
-    if(specification.primaryGroupingSize)
+    if(positiveSubpattern.primaryGroupingSize)
     {
         var regex = new RegExp(
-            '(\\d)(?=(\\d{' + (specification.secondaryGroupingSize ? specification.secondaryGroupingSize : specification.primaryGroupingSize) + '})*\\d{' + specification.primaryGroupingSize + '}$)',
+            '(\\d)(?=(\\d{' + (positiveSubpattern.secondaryGroupingSize ? positiveSubpattern.secondaryGroupingSize : positiveSubpattern.primaryGroupingSize) + '})*\\d{' + positiveSubpattern.primaryGroupingSize + '}$)',
             'g');
 
         transformations.push(
@@ -805,10 +824,10 @@ function formatNumber(
             });
     }
 
-    if(specification.maximumFractionDigits > specification.minimumFractionDigits)
+    if(positiveSubpattern.maximumFractionDigits > positiveSubpattern.minimumFractionDigits)
     {
         var regex = new RegExp(
-            '0{1,' + (specification.maximumFractionDigits - specification.minimumFractionDigits) + '}$',
+            '0{1,' + (positiveSubpattern.maximumFractionDigits - positiveSubpattern.minimumFractionDigits) + '}$',
             'g')
 
         transformations.push(
@@ -860,8 +879,8 @@ function parseNumber(
     value
     )
 {
-    var specification = parseNumberFormatPattern(numberFormatPattern);
-    var regexes = specification.regexes();
+    var pattern = parseNumberFormatPattern(numberFormatPattern);
+    var regexes = pattern.regexes();
     function parse(
         value
         )
