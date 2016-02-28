@@ -940,20 +940,22 @@ function formatNumber(
     number
     )
 {
-    var specification = parseNumberFormatPattern(numberFormatPattern);
+    var pattern = parseNumberFormatPattern(numberFormatPattern);
+    var positiveSubpattern = pattern.positive;
+    var negativeSubpattern = pattern.negative;
     var transformations = [];
 
     var affixes =
     {
         positive:
         {
-            prefix: specification.prefix ? specification.prefix : '',
-            suffix: specification.suffix ? specification.suffix : ''
+            prefix: positiveSubpattern.prefix ? positiveSubpattern.prefix : '',
+            suffix: positiveSubpattern.suffix ? positiveSubpattern.suffix : ''
         },
         negative:
         {
-            prefix: specification.negative ? (specification.negative.prefix ? specification.negative.prefix : '') : '-',
-            suffix: specification.negative && specification.negative.suffix ? specification.negative.suffix : ''
+            prefix: negativeSubpattern ? (negativeSubpattern.prefix ? negativeSubpattern.prefix : '') : '-',
+            suffix: negativeSubpattern && negativeSubpattern.suffix ? negativeSubpattern.suffix : ''
         }
     };
 
@@ -979,7 +981,7 @@ function formatNumber(
         {
             var positive = number >= 0;
             number = positive ? number : -number;
-            var components = number.toFixed(specification.maximumFractionDigits).split('.');
+            var components = number.toFixed(positiveSubpattern.maximumFractionDigits).split('.');
             components[0] = components[0].replace(
                 /^0+/,
                 '');
@@ -991,7 +993,7 @@ function formatNumber(
         });
 
     var padding = '';
-    while(padding.length < specification.minimumIntegerDigits)
+    while(padding.length < positiveSubpattern.minimumIntegerDigits)
         padding += '0';
 
     transformations.push(
@@ -1006,10 +1008,10 @@ function formatNumber(
             };
         });
 
-    if(specification.primaryGroupingSize)
+    if(positiveSubpattern.primaryGroupingSize)
     {
         var regex = new RegExp(
-            '(\\d)(?=(\\d{' + (specification.secondaryGroupingSize ? specification.secondaryGroupingSize : specification.primaryGroupingSize) + '})*\\d{' + specification.primaryGroupingSize + '}$)',
+            '(\\d)(?=(\\d{' + (positiveSubpattern.secondaryGroupingSize ? positiveSubpattern.secondaryGroupingSize : positiveSubpattern.primaryGroupingSize) + '})*\\d{' + positiveSubpattern.primaryGroupingSize + '}$)',
             'g');
 
         transformations.push(
@@ -1027,10 +1029,10 @@ function formatNumber(
             });
     }
 
-    if(specification.maximumFractionDigits > specification.minimumFractionDigits)
+    if(positiveSubpattern.maximumFractionDigits > positiveSubpattern.minimumFractionDigits)
     {
         var regex = new RegExp(
-            '0{1,' + (specification.maximumFractionDigits - specification.minimumFractionDigits) + '}$',
+            '0{1,' + (positiveSubpattern.maximumFractionDigits - positiveSubpattern.minimumFractionDigits) + '}$',
             'g')
 
         transformations.push(
