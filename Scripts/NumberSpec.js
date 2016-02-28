@@ -316,7 +316,7 @@ describe(
     });
 
 describe(
-    'numberFormatSpecification',
+    'numberFormatPattern',
     function()
     {
         describe(
