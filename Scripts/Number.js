@@ -549,12 +549,19 @@ function numberFormatPattern(
             '\\$&');
     }
 
-    numberFormatSubpattern.prototype.regex = function(
-        affixes
-        )
+    numberFormatSubpattern.prototype.prefixRegex = function()
     {
-        affixes = affixes ? affixes : this;
-        return affixRegex(affixes.prefix) + this.numberRegex() + affixRegex(affixes.suffix);
+        return affixRegex(this.prefix);
+    };
+
+    numberFormatSubpattern.prototype.suffixRegex = function()
+    {
+        return affixRegex(this.suffix);
+    };
+
+    numberFormatSubpattern.prototype.regex = function()
+    {
+        return this.prefixRegex() + this.numberRegex() + this.suffixRegex();
     };
 
     numberFormatSubpattern.prototype.toString = function()
@@ -620,7 +627,7 @@ function numberFormatPattern(
         if(!this.negative)
             return minusRegex + this.positive.regex();
 
-        return this.positive.regex(this.negative);
+        return this.negative.prefixRegex() + this.positive.numberRegex() + this.negative.suffixRegex();
     };
 
     numberFormatPattern.prototype.regexes = function()
