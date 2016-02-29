@@ -881,15 +881,19 @@ function parseNumber(
 {
     var pattern = parseNumberFormatPattern(numberFormatPattern);
     var regexes = pattern.regexes();
+    var nonDecimal = new RegExp(
+        '[^0-9' + Number.symbols.decimal + ']',
+        'g');
+
     function parse(
         value
         )
     {
         if(value.match(regexes.positive))
-            return Number(value.replace(/[^0-9.]/g, ''));
+            return Number(value.replace(nonDecimal, '').replace(Number.symbols.decimal, '.'));
 
         if(value.match(regexes.negative))
-            return -Number(value.replace(/[^0-9.]/g, ''));
+            return -Number(value.replace(nonDecimal, '').replace(Number.symbols.decimal, '.'));
 
         return NaN;
     }
