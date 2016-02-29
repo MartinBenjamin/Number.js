@@ -676,13 +676,13 @@ describe(
                 });
         });
 
-        assert.strictEquals("parseNumber('0.##', '12')", 12);
-        assert.strictEquals("parseNumber('0.##', '12.3')", 12.3);
-        assert.strictEquals("parseNumber('0.0#', '12.3')", 12.3);
-        assert.strictEquals("isNaN(parseNumber('0.00', '12.3'))", true);
-        assert.strictEquals("parseNumber('0.##', '12.34')", 12.34);
-        assert.strictEquals("parseNumber('0.0#', '12.34')", 12.34);
-        assert.strictEquals("parseNumber('0.00', '12.34')", 12.34);
-        assert.strictEquals("isNaN(parseNumber('0.00', '12.345'))", true);
-        assert.strictEquals("parseNumber('0.00#', '12.345')", 12.345);
+        assert.strictEquals("parseNumber('0.##', '" + transform('12') + "')", 12);
+        assert.strictEquals("parseNumber('0.##', '" + transform('12.3') + "')", 12.3);
+        assert.strictEquals("parseNumber('0.0#', '" + transform('12.3') + "')", 12.3);
+        assert.strictEquals("isNaN(parseNumber('0.00', '" + transform('12.3') + "'))", true);
+        assert.strictEquals("parseNumber('0.##', '" + transform('12.34') + "')", 12.34);
+        assert.strictEquals("parseNumber('0.0#', '" + transform('12.34') + "')", 12.34);
+        assert.strictEquals("parseNumber('0.00','" + transform('12.34') + "')", 12.34);
+        assert.strictEquals("isNaN(parseNumber('0.00', '" + transform('12.345') + "'))", true);
+        assert.strictEquals("parseNumber('0.00#', '" + transform('12.345') + "')", 12.345);
     });
