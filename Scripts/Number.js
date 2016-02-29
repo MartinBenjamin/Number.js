@@ -662,7 +662,7 @@ with(parser)
         prefix        : new optional('affix'),
         suffix        : new optional('affix'),
         affix         : new oneOrMore(new terminal(/^[^#0.,;]$/)),
-        number        : new sequence(['integer', new optional(new sequence([new terminal('.'), 'fraction']))]),
+        number        : new sequence(['integer', new optional(new sequence(['decimal', 'fraction']))]),
         integer       : new sequence([new optional(new sequence(['firstHashGroup', new zeroOrMore('hashGroup'), new optional('hashes')])), 'minimumDigits']),
         minimumDigits : new sequence([new zeroOrMore('zeroGroup'), 'zeros']),
         fraction      : new choice([new sequence([new optional('zeros'), 'hashes']), 'zeros']),
@@ -673,7 +673,8 @@ with(parser)
         zeros         : new oneOrMore('zero'),
         hash          : new terminal('#'),
         zero          : new terminal('0'),
-        group         : new terminal(',')
+        group         : new terminal(','),
+        decimal       : new terminal('.')
     };
 
 for(var ruleName in numberFormatPatternRules)
