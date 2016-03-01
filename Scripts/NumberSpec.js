@@ -78,7 +78,6 @@ var testData =
         [ '#,##,000', new numberFormatSubpattern(3, 0, 0, 3, 2)],
         ['#,###,000', new numberFormatSubpattern(3, 0, 0, 3, 3)],
 
-
         [     '0000', new numberFormatSubpattern(4, 0, 0      )],
         [    '000,0', new numberFormatSubpattern(4, 0, 0, 1   )],
         [   '00,0,0', new numberFormatSubpattern(4, 0, 0, 1, 1)],
@@ -92,7 +91,6 @@ var testData =
         [  '#,0,000', new numberFormatSubpattern(4, 0, 0, 3, 1)],
         [ '#,#0,000', new numberFormatSubpattern(4, 0, 0, 3, 2)],
         ['#,##0,000', new numberFormatSubpattern(4, 0, 0, 3, 3)],
-
 
         [    '00000', new numberFormatSubpattern(5, 0, 0      )],
         [   '0000,0', new numberFormatSubpattern(5, 0, 0, 1   )],
@@ -428,6 +426,8 @@ describe(
 
         ];
 
+        assert.strictEquals("formatNumber(parseNumberFormatPattern('#,##0'), 1234)", "'1,234'"); 
+
         testData.map(
             function(
                 data
@@ -601,6 +601,8 @@ describe(
         assert.strictEquals("parseNumber('+0;-0', '-1')", -1);
         assert.strictEquals("parseNumber('0+;0-', '1+')", 1);
         assert.strictEquals("parseNumber('0+;0-', '1-')", -1);
+
+        assert.strictEquals("parseNumber(parseNumberFormatPattern('#,##0'), '1,234')", 1234);
 
         var testNumbers =
             [

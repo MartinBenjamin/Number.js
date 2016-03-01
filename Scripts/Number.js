@@ -743,7 +743,7 @@ function formatNumber(
     number
     )
 {
-    var pattern = parseNumberFormatPattern(numberFormatPattern);
+    var pattern = typeof numberFormatPattern == 'string' ? parseNumberFormatPattern(numberFormatPattern) : numberFormatPattern;
     var positiveSubpattern = pattern.positive;
     var negativeSubpattern = pattern.negative;
     var transformations = [];
@@ -887,7 +887,7 @@ function parseNumber(
     value
     )
 {
-    var pattern = parseNumberFormatPattern(numberFormatPattern);
+    var pattern = typeof numberFormatPattern == 'string' ? parseNumberFormatPattern(numberFormatPattern) : numberFormatPattern;
     var regexes = pattern.regexes();
     var nonDecimal = new RegExp(
         '[^0-9' + Number.symbols.decimal + ']',
