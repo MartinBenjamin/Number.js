@@ -610,37 +610,22 @@ describe(
                 0
             ].concat(
                 [
+                    0,
                     1,
-                    11,
-                    111,
-                    1111,
-                    11111,
-                    111111,
-                    1111111,
-                    11111111,
-                    111111111,
-                    1111111111
+                    2,
+                    3,
+                    4,
+                    5,
+                    6
                 ].map(
                     function(
-                        number
+                        power
                         )
                     {
-                        return [1, -2, 3, -4, 5, -6, 7, -8, 9].map(
-                            function(
-                                multiplier
-                                )
-                            {
-                                return number * multiplier;
-                            });
-                    }).reduce(
-                        function(
-                            lhs,
-                            rhs
-                            )
-                        {
-                            return lhs.concat(rhs);
-                        }));
-
+                        return Math.floor(Math.PI * Math.pow(10, power));
+                    })
+            );
+                        
         var maximumDigits = 6;
 
         var patterns = [];
