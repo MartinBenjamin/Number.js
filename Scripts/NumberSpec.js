@@ -211,10 +211,10 @@ describe(
                 assert.strictEquals("parseNumberFormatPattern('" + data[0] + "').negative.maximumFractionDigits", data[1].maximumFractionDigits);
             });
 
-        assert.strictEquals("parseNumberFormatPattern('A0').positive.prefix", "'A'");
-        assert.strictEquals("parseNumberFormatPattern('0A').positive.suffix", "'A'");
-        assert.strictEquals("parseNumberFormatPattern('0;A0').negative.prefix", "'A'");
-        assert.strictEquals("parseNumberFormatPattern('0;0A').negative.suffix", "'A'");
+        assert.strictEquals("parseNumberFormatPattern('A0B').positive.prefix", "'A'");
+        assert.strictEquals("parseNumberFormatPattern('A0B').positive.suffix", "'B'");
+        assert.strictEquals("parseNumberFormatPattern('A0B;C0D').negative.prefix", "'C'");
+        assert.strictEquals("parseNumberFormatPattern('A0B;C0D').negative.suffix", "'D'");
 
         describe(
             'Errors',
