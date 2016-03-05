@@ -2,13 +2,11 @@
 <h2>Synopsis</h1>
 Localized parsing and formatting of numbers using LDML compliant <a href="http://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns" target="_blank">Number Format Patterns</a>.
 <p>A full specification of Number.js is provided by the tests in NumberSpec.js.  In brief, Number.js provides two functions:</p>
-
 <ul>
 <li>formatNumber(pattern, numberString)</li>
 <li>parseNumber(pattern, number)</li>
 </ul>
 The pattern parameter is an LDML compliant Number Format Pattern string.  The parsing functions are built for partial application:
-
 <pre><code>
 var format = formatNumber('#,##0.##');
 var numberString = format(1000);
