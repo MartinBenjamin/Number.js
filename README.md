@@ -10,11 +10,11 @@ Localized parsing and formatting of numbers using LDML compliant <a href="http:/
 The pattern parameter is an LDML compliant Number Format Pattern string.  The parsing functions are built for partial application:
 
 <pre><code>
-var parse = parseNumber('#,##0.##');
-var number = parse('1,000.00');
-
 var format = formatNumber('#,##0.##');
 var numberString = format(1000);
+
+var parse = parseNumber('#,##0.##');
+var number = parse('1,000.00');
 </code></pre>
 
 <h2>Getting Started</h2>
