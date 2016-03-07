@@ -381,17 +381,25 @@ describe(
     'parseNumber',
     function()
     {
-        assert.strictEquals("parseNumber('0', '0')", 0);
-        assert.strictEquals("parseNumber('0', '1')", 1);
-        assert.strictEquals("parseNumber('0', '-1')", -1);
-        assert.strictEquals("parseNumber('A0', 'A1')", 1);
-        assert.strictEquals("parseNumber('0A', '1A')", 1);
-        assert.strictEquals("parseNumber('0;A0', 'A1')", -1);
-        assert.strictEquals("parseNumber('0;0A', '1A')", -1);
-        assert.strictEquals("parseNumber('+0;-0', '+1')", 1);
-        assert.strictEquals("parseNumber('+0;-0', '-1')", -1);
-        assert.strictEquals("parseNumber('0+;0-', '1+')", 1);
-        assert.strictEquals("parseNumber('0+;0-', '1-')", -1);
+        [
+            ['0'    , '0' ,  0],
+            ['0'    , '1' ,  1],
+            ['0'    , '-1', -1],
+            ['A0'   , 'A1',  1],
+            ['0A'   , '1A',  1],
+            ['0;A0' , 'A1', -1],
+            ['0;0A' , '1A', -1],
+            ['+0;-0', '+1',  1],
+            ['+0;-0', '-1', -1],
+            ['0+;0-', '1+',  1],
+            ['0+;0-', '1-', -1]
+        ].forEach(
+            function(
+                testData
+                )
+            {
+                assert.strictEquals("parseNumber('" + testData[0] + "', '" + testData[1] + "')", testData[2]);
+            });
 
         assert.strictEquals("parseNumber(parseNumberFormatPattern('#,##0'), '" + transform('1,234') + "')", 1234);
 
