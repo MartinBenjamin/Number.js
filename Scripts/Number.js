@@ -484,7 +484,7 @@ function numberFormatPattern(
         var groupRegex = Number.symbols.group.replace(
             syntaxCharacters,
             '\\$&');
- 
+
         var integerRegex = ''
         if(!this.primaryGroupingSize)
             integerRegex = '([1-9]\\d*)?\\d{' + this.minimumIntegerDigits + '}';
@@ -813,7 +813,7 @@ function formatNumber(
 
     if(positiveSubpattern.primaryGroupingSize)
     {
-        var regex = new RegExp(
+        var groupRegex = new RegExp(
             '(\\d)(?=(\\d{' + (positiveSubpattern.secondaryGroupingSize ? positiveSubpattern.secondaryGroupingSize : positiveSubpattern.primaryGroupingSize) + '})*\\d{' + positiveSubpattern.primaryGroupingSize + '}$)',
             'g');
 
@@ -825,7 +825,7 @@ function formatNumber(
                 return {
                     affixes : number.affixes,
                     integer : number.integer.replace(
-                        regex,
+                        groupRegex,
                         '$1' + Number.symbols.group),
                     fraction: number.fraction
                 };
@@ -834,7 +834,7 @@ function formatNumber(
 
     if(positiveSubpattern.maximumFractionDigits > positiveSubpattern.minimumFractionDigits)
     {
-        var regex = new RegExp(
+        var trailingZeroRegex = new RegExp(
             '0{1,' + (positiveSubpattern.maximumFractionDigits - positiveSubpattern.minimumFractionDigits) + '}$',
             'g')
 
@@ -847,12 +847,12 @@ function formatNumber(
                     affixes : number.affixes,
                     integer : number.integer,
                     fraction: number.fraction.replace(
-                        regex,
+                        trailingZeroRegex,
                         '')
                 };
             });
     }
-    
+
     transformations.push(
         function(
             number
