@@ -655,8 +655,6 @@ function numberFormatPattern(
 var numberFormatPatternRules;
 
 with(parser)
-{
-    var escape = "'";
     numberFormatPatternRules =
     {
         pattern       : new sequence(['subpattern', new optional(new sequence([new terminal(';'), 'subpattern'])), new eos()]),
@@ -678,11 +676,10 @@ with(parser)
         zero          : new terminal('0'),
         group         : new terminal(','),
         decimal       : new terminal('.'),
-        escape        : new terminal(escape),
+        escape        : new terminal("'"),
         escapedEscape : new sequence(['escape', 'escape']),
         escaped       : new sequence(['escape', new oneOrMore(new choice([new terminal(/^[^']$/), 'escapedEscape'])), 'escape'])
     };
-}
 
 for(var ruleName in numberFormatPatternRules)
 {
