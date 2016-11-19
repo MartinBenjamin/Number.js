@@ -655,13 +655,15 @@ function numberFormatPattern(
 var numberFormatPatternRules;
 
 with(parser)
+{
+    var escape = "'";
     numberFormatPatternRules =
     {
         pattern       : new sequence(['subpattern', new optional(new sequence([new terminal(';'), 'subpattern'])), new eos()]),
         subpattern    : new sequence(['prefix', 'number', 'suffix']),
         prefix        : new optional('affix'),
         suffix        : new optional('affix'),
-        affix         : new oneOrMore(new terminal(/^[^#0.,;]$/)),
+        affix         : new oneOrMore(new choice(['escapedEscape', 'escaped', new terminal(/^[^#0.,;]$/)])),
         number        : new sequence(['integer', new optional(new sequence(['decimal', 'fraction']))]),
         integer       : new sequence([new optional('padding'), 'minimumDigits']),
         padding       : new sequence(['firstHashGroup', new zeroOrMore('hashGroup'), new optional('hashes')]),
@@ -675,8 +677,12 @@ with(parser)
         hash          : new terminal('#'),
         zero          : new terminal('0'),
         group         : new terminal(','),
-        decimal       : new terminal('.')
+        decimal       : new terminal('.'),
+        escape        : new terminal(escape),
+        escapedEscape : new sequence(['escape', 'escape']),
+        escaped       : new sequence(['escape', new oneOrMore(new choice([new terminal(/^[^']$/), 'escapedEscape'])), 'escape'])
     };
+}
 
 for(var ruleName in numberFormatPatternRules)
 {

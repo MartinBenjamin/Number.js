@@ -338,6 +338,12 @@ describe(
         assert.strictEquals("parseNumberFormatPattern('A0B;C0D').negative.prefix", "'C'");
         assert.strictEquals("parseNumberFormatPattern('A0B;C0D').negative.suffix", "'D'");
 
+        assert.strictEquals("parseNumberFormatPattern(\"'A'0B\").positive.prefix", "\"'A'\"");
+        assert.strictEquals("parseNumberFormatPattern(\"'##'0B\").positive.prefix", "\"'##'\"");
+        assert.strictEquals("parseNumberFormatPattern(\"'''##'0B\").positive.prefix", "\"'''##'\"");
+        assert.strictEquals("parseNumberFormatPattern(\"'#''#'0B\").positive.prefix", "\"'#''#'\"");
+        assert.strictEquals("parseNumberFormatPattern(\"'##'''0B\").positive.prefix", "\"'##'''\"");
+
         describe(
             'Errors',
             function()
