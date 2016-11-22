@@ -581,7 +581,7 @@ var formatNumber;
 
     numberFormatSubpattern.prototype.numberRegex = function()
     {
-        return this.integerRegex() + this.fractionRegex();
+        return '(' + this.integerRegex() + this.fractionRegex() + ')';
     };
 
     function affixRegex(
@@ -952,11 +952,13 @@ function parseNumber(
         value
         )
     {
-        if(value.match(regexes.positive))
-            return Number(value.replace(nonDecimal, '').replace(Number.symbols.decimal, '.'));
+        var match = regexes.positive.exec(value);
+        if(match)
+            return Number(match[1].replace(nonDecimal, '').replace(Number.symbols.decimal, '.'));
 
-        if(value.match(regexes.negative))
-            return -Number(value.replace(nonDecimal, '').replace(Number.symbols.decimal, '.'));
+        match = regexes.negative.exec(value);
+        if(match)
+            return -Number(match[1].replace(nonDecimal, '').replace(Number.symbols.decimal, '.'));
 
         return NaN;
     }
