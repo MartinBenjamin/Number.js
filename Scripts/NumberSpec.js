@@ -503,6 +503,11 @@ describe(
             [       '0B'     ,      1    ,                         '1B'     ],
             [       '0;A0'   ,     -1    ,                        'A1'      ],
             [       '0;0B'   ,     -1    ,                         '1B'     ],
+            [    "'A'0"      ,      1    ,                        'A1'      ],
+            [    "'0'0"      ,      1    ,                        '01'      ],
+            [    "'#'0"      ,      1    ,                        '#1'      ],
+            [     "''0"      ,      1    ,                        "'1"      ],
+            [  "'A'''0"      ,      1    ,                       "A'1"      ],
             ['#,##0.00'      , 1e13-0.01 ,         '9,999,999,999,999.99'   ],
             ['#,##0.00'      ,-1e13+0.01 ,        '-9,999,999,999,999.99'   ]
         ];
@@ -524,7 +529,7 @@ describe(
                 data
                 )
             {
-                assert.strictEquals("formatNumber('" + data[0] + "', " + data[1] + ")", "'" + data[2] + "'");
+                assert.strictEquals("formatNumber(\"" + data[0] + "\", " + data[1] + ")", "\"" + data[2] + "\"");
             });
 
         describe(
@@ -629,4 +634,7 @@ describe(
         assert.strictEquals("parseNumber('0.00','" + transform('12.34') + "')", 12.34);
         assert.strictEquals("isNaN(parseNumber('0.00', '" + transform('12.345') + "'))", true);
         assert.strictEquals("parseNumber('0.00#', '" + transform('12.345') + "')", 12.345);
+        assert.strictEquals("parseNumber(\"'A'0\", \"" + transform("A1") + "\")", 1);
+        assert.strictEquals("parseNumber(\"''0\", \"" + transform("'1") + "\")", 1);
+
     });
