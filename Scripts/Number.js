@@ -463,12 +463,27 @@ var formatNumber;
         '+': Number.symbols.plusSign,
         '-': Number.symbols.minusSign
     };
-    affixSymbols[escapedEscapeSymbol] = null;
     affixSymbols[escapeSymbol       ] = null;
+    affixSymbols[escapedEscapeSymbol] = null;
 
     var symbols = [];
     for(var symbol in affixSymbols)
         symbols.push(symbol);
+
+    symbols.sort(
+        function(
+            x,
+            y
+            )
+        {
+            if(x.length > y.length)
+                return -1;
+
+            else if(x.length < y.length)
+                return 1;
+
+            return 0;
+        });
 
     symbols = symbols.map(
         function(
