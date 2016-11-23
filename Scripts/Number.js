@@ -485,7 +485,7 @@ var formatNumber;
             return 0;
         });
 
-    symbols = symbols.map(
+    var escapedSymbols = symbols.map(
         function(
             symbol
             )
@@ -496,7 +496,7 @@ var formatNumber;
         });
 
     var symbolRegex = new RegExp(
-        '(' + symbols.join('|') + ')',
+        '(' + escapedSymbols.join('|') + ')',
         'g');
 
     function escape(
