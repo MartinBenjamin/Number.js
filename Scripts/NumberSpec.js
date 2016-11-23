@@ -14,25 +14,47 @@
     }
 };
 
-var localizedReplacements = {
-    '+': Number.symbols.plusSign,
-    '-': Number.symbols.minusSign,
-    ',': Number.symbols.group,
-    '.': Number.symbols.decimal
-};
-
-function transform(
-    number
-    )
+var transform;
+(function()
 {
-    return number.split('').map(
+    var localizedReplacements = {
+        '+': Number.symbols.plusSign,
+        '-': Number.symbols.minusSign,
+        ',': Number.symbols.group,
+        '.': Number.symbols.decimal
+    };
+
+    var symbols = [];
+
+    for(var symbol in localizedReplacements)
+        symbols.push(symbol);
+
+    var escapedSymbols = symbols.map(
         function(
-            char
+            symbol
             )
         {
-            return char in localizedReplacements ? localizedReplacements[char] : char;
-        }).join('');
-}
+            return '[' + symbol + ']';
+        });
+
+    var symbolRegex = new RegExp(
+        '(' + escapedSymbols.join('|') + ')',
+        'g');
+
+    transform = function(
+        number
+        )
+    {
+        return number.replace(
+            symbolRegex,
+            function(
+                symbol
+                )
+            {
+                return localizedReplacements[symbol];
+            });
+    }
+})();
 
 var testData =
     [
