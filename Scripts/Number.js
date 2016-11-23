@@ -967,6 +967,9 @@ function parseNumber(
         value
         )
     {
+        for(polarity in regexes)
+            regexes[polarity].lastIndex = 0;
+
         var match = regexes.positive.exec(value);
         if(match)
             return Number(match[1].replace(nonDecimal, '').replace(Number.symbols.decimal, '.'));
