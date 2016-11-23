@@ -545,23 +545,39 @@ describe(
     function()
     {
         [
-            ['0'    , '0' ,  0],
-            ['0'    , '1' ,  1],
-            ['0'    , '-1', -1],
-            ['A0'   , 'A1',  1],
-            ['0A'   , '1A',  1],
-            ['0;A0' , 'A1', -1],
-            ['0;0A' , '1A', -1],
-            ['+0;-0', '+1',  1],
-            ['+0;-0', '-1', -1],
-            ['0+;0-', '1+',  1],
-            ['0+;0-', '1-', -1]
+            ['0'       , '0'  ,  0],
+            ['0'       , '1'  ,  1],
+            ['0'       , '-1' , -1],
+            ['A0'      , 'A1' ,  1],
+            ['0A'      , '1A' ,  1],
+            ['0;A0'    , 'A1' , -1],
+            ['0;0A'    , '1A' , -1],
+            ['+0;-0'   , '+1' ,  1],
+            ['+0;-0'   , '-1' , -1],
+            ['0+;0-'   , '1+' ,  1],
+            ['0+;0-'   , '1-' , -1],
+            ["'A'0"    , 'A1' ,  1],
+            ["0'A'"    , '1A' ,  1],
+            ["0;'A'0"  , 'A1' , -1],
+            ["0;0'A'"  , '1A' , -1],
+            ["'2'0"    , '21' ,  1],
+            ["0'2'"    , '12' ,  1],
+            ["A0;'2'0" , '21' , -1],
+            ["A0;0'2'" , '12' , -1],
+            ["''0"     , "'1" ,  1],
+            ["0''"     , "1'" ,  1],
+            ["0;''0"   , "'1" , -1],
+            ["0;0''"   , "1'" , -1],
+            ["'A'''0"  , "A'1",  1],
+            ["0'A'''"  , "1A'",  1],
+            ["0;'A'''0", "A'1", -1],
+            ["0;0'A'''", "1A'", -1]
         ].forEach(
             function(
                 testData
                 )
             {
-                assert.strictEquals("parseNumber('" + testData[0] + "', '" + testData[1] + "')", testData[2]);
+                assert.strictEquals("parseNumber(\"" + testData[0] + "\", \"" + testData[1] + "\")", testData[2]);
             });
 
         assert.strictEquals("parseNumber(parseNumberFormatPattern('#,##0'), '" + transform('1,234') + "')", 1234);
@@ -634,8 +650,4 @@ describe(
         assert.strictEquals("parseNumber('0.00','" + transform('12.34') + "')", 12.34);
         assert.strictEquals("isNaN(parseNumber('0.00', '" + transform('12.345') + "'))", true);
         assert.strictEquals("parseNumber('0.00#', '" + transform('12.345') + "')", 12.345);
-        assert.strictEquals("parseNumber(\"'A'0\", \"" + transform("A1") + "\")", 1);
-        assert.strictEquals("parseNumber(\"''0\", \"" + transform("'1") + "\")", 1);
-        assert.strictEquals("parseNumber(\"'1'0\", \"" + transform("11") + "\")", 1);
-
     });
